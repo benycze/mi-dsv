@@ -1,6 +1,8 @@
 package exceptions;
 
-public class DuplicateKeyException extends Exception {
+import org.apache.xmlrpc.XmlRpcException;
+
+public class DuplicateKeyException extends XmlRpcException {
 
 	private static final long serialVersionUID = -1937161867341487222L;
 
