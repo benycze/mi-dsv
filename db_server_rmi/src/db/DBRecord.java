@@ -1,5 +1,6 @@
 package db;
 
+import java.io.Serializable;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 
@@ -9,8 +10,12 @@ import java.util.Calendar;
  * @author pavel
  * 
  */
-public class DBRecord implements Comparable<DBRecord> {
-
+public class DBRecord implements Comparable<DBRecord>,Serializable {
+	
+	private static final long serialVersionUID = -1937161867341487555L;
+	
+	private boolean recordLocked;
+	
 	/**
 	 * Key for the record
 	 */
@@ -32,6 +37,7 @@ public class DBRecord implements Comparable<DBRecord> {
 	 * Default constructor, creates record without aby data
 	 */
 	public DBRecord() {
+		this.recordLocked = false;
 	}
 
 	/**
@@ -43,6 +49,7 @@ public class DBRecord implements Comparable<DBRecord> {
 	 * @param tsmodify
 	 */
 	public DBRecord(int key, String message, String tscreate, String tsmodify) {
+		this();
 		this.key = key;
 		this.message = message;
 		this.tscreate = tscreate;
@@ -57,6 +64,7 @@ public class DBRecord implements Comparable<DBRecord> {
 	 * @param message
 	 */
 	public DBRecord(int key, String message) {
+		this();
 		this.key = key;
 		this.message = message;
 		// create timestamp
@@ -75,7 +83,7 @@ public class DBRecord implements Comparable<DBRecord> {
 	 *            - CSV string to insert
 	 */
 	public DBRecord(String csvLine) {
-		String[] parsedLine = csvLine.split(";");
+		String[] parsedLine = csvLine.replaceAll("\"", "").split(";");
 		String tscreate = parsedLine[0];
 		String tsmodify = parsedLine[1];
 		int key = Integer.parseInt(parsedLine[2]);
@@ -153,8 +161,8 @@ public class DBRecord implements Comparable<DBRecord> {
 	 * @return CSV string
 	 */
 	public String getCSVRecord() {
-		String retString = this.tscreate + ";" + this.tsmodify + ";" + this.key
-				+ ";" + message;
+		String retString = "\""+this.tscreate + "\""+ ";" + "\""+this.tsmodify+"\"" + ";" + "\""+this.key+"\""+
+				";" +"\""+ message+"\"";
 		return retString;
 	}
 
@@ -174,4 +182,22 @@ public class DBRecord implements Comparable<DBRecord> {
 		return 0;
 	}
 
+	private synchronized boolean LockVal(boolean val,boolean set){
+		if(set)
+			this.recordLocked = val;
+		return this.recordLocked;
+	}
+	
+	public void lockRecord(){
+		this.LockVal(true, true);
+	}
+	
+	public void unlockRecord(){
+		this.LockVal(false, true);
+	}
+	
+	public boolean isLocked(){
+		return this.LockVal(true, false);
+	}
+	
 }

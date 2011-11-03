@@ -97,6 +97,15 @@ public class Client {
 				String db = parsedCSV[1];
 				int key = Integer.parseInt(parsedCSV[2]);
 				getCmd(db, key, dbs);
+			} else if(cmd.equals("getA")){
+				String db = parsedCSV[1];
+				String keyStr = parsedCSV[2];
+				String[] keys = keyStr.split(",");
+				Integer[] keyArr = new Integer[keys.length];
+				for(int i=0;i<keys.length;i++){
+					keyArr[i] = Integer.parseInt(keys[i]);
+				}
+				getACmd(db,keyArr,dbs);
 			} else if (cmd.equals("createdb")) {
 				String db = parsedCSV[1];
 				createDb(db, dbs);
@@ -107,6 +116,30 @@ public class Client {
 		} catch (RemoteException ex) {
 			ex.printStackTrace();
 		}
+	}
+
+	private static void getACmd(String db,Integer[] keys,DBServer dbs) throws RemoteException {
+		try{
+			System.out.print(">>> get records with keys \"");
+			for(int i=0;i<keys.length-1;i++){
+				System.out.print(keys[i]+",");
+			}
+			System.out.println(keys[keys.length-1]+"\" from database \'"+db+"\'");
+				
+			DBRecord[] records = dbs.getA(db, keys);
+			for(DBRecord dbr : records){
+				System.out.println("<<< record from database \"" + db
+						+ "\" with key \"" + dbr.getKey() + "\" --> [ \"" + dbr.getMessage() + "\" ]");
+			}
+			
+		} catch (DBNotFoundException e) {
+			System.out.println(">> ERROR - database " + "'" + db
+					+ "' does not exist.");
+		} catch (KeyNotFoundException e) {
+			System.out.println(">> ERROR - record with key \"" + e.getKey()
+					+ "\" does not exist.");
+		}
+		
 	}
 
 	/**
@@ -143,9 +176,10 @@ public class Client {
 	private static void getCmd(String db, int key, DBServer dbs)
 			throws RemoteException {
 		try {
+			System.out.println(">>> get record with key \""+key+"\" from database \'"+db+"\'");
 			DBRecord dbRec = dbs.get(db, key);
 			System.out.println("<<< record from database \"" + db
-					+ "\" with key \"" + key + "\" --> [ " + dbRec + " ]");
+					+ "\" with key \"" + key + "\" --> [ \"" + dbRec.getMessage() + "\" ]");
 		} catch (DBNotFoundException e) {
 			System.out.println(">> ERROR - database " + "'" + db
 					+ "' does not exist.");
@@ -197,7 +231,7 @@ public class Client {
 			DBServer dbs) throws RemoteException {
 		try {
 			System.out.println(">> Inserting into database \"" + db
-					+ "\" record[ " + message + " ]");
+					+ "\" record[ \"" + message + "\" ]");
 			dbs.insert(db, key, message);
 		} catch (DBNotFoundException e) {
 			System.out.println("<< ERROR - database \"" + db
