@@ -27,23 +27,28 @@ public class Client {
 		String filePath = args[2];
 
 		try {
-			 XmlRpcClientConfigImpl config = new XmlRpcClientConfigImpl();
-			 //konfigurace
-			 InetAddress addr = InetAddress.getByName(IP);
-			 config.setServerURL(new URL("http://"+addr.getHostAddress()+":"+port)); // nastaveni adresy serveru
-		     config.setEnabledForExtensions(true);		// true -> pridani extensions - odkloneni od standardu!
-		     config.setConnectionTimeout(60 * 1000);	// nastaveni timeoutu
-		     config.setReplyTimeout(60 * 1000);			// nastaveni reply timeoutu
-		     //vytvoreni klienta
-		     XmlRpcClient client = new XmlRpcClient();
-		     // use Commons HttpClient as transport
-		     //client.setTransportFactory(new XmlRpcCommonsTransportFactory(client));
-		     client.setTransportFactory(new XmlRpcSunHttpTransportFactory(client));
-		     // set configuration
-		     client.setConfig(config);			 
-			//////////////////////////////////////////
+			XmlRpcClientConfigImpl config = new XmlRpcClientConfigImpl();
+			// konfigurace
+			InetAddress addr = InetAddress.getByName(IP);
+			config.setServerURL(new URL("http://" + addr.getHostAddress() + ":"
+					+ port)); // nastaveni adresy serveru
+			config.setEnabledForExtensions(true); // true -> pridani extensions
+													// - odkloneni od standardu!
+			config.setConnectionTimeout(60 * 1000); // nastaveni timeoutu
+			config.setReplyTimeout(60 * 1000); // nastaveni reply timeoutu
+			// vytvoreni klienta
+			XmlRpcClient client = new XmlRpcClient();
+			// use Commons HttpClient as transport
+			// client.setTransportFactory(new
+			// XmlRpcCommonsTransportFactory(client));
+			client
+					.setTransportFactory(new XmlRpcSunHttpTransportFactory(
+							client));
+			// set configuration
+			client.setConfig(config);
+			// ////////////////////////////////////////
 			parseInput(filePath, client);
-		} catch (XmlRpcException e){
+		} catch (XmlRpcException e) {
 			System.err.println("Data exception: " + e.getMessage());
 		} catch (Exception e) {
 			// neco je spatne :(
@@ -55,9 +60,10 @@ public class Client {
 	 * Parse input
 	 * 
 	 * @param string
-	 * @throws XmlRpcException 
+	 * @throws XmlRpcException
 	 */
-	private static void parseInput(String path, XmlRpcClient client) throws XmlRpcException {
+	private static void parseInput(String path, XmlRpcClient client)
+			throws XmlRpcException {
 		try {
 			BufferedReader br = new BufferedReader(new FileReader(path));
 			String line;
@@ -68,9 +74,9 @@ public class Client {
 					parseCommand(line, client);
 				}
 			}
-			Object[] parm ={};
-			client.execute("db.flush",parm);
-			
+			Object[] parm = {};
+			client.execute("db.flush", parm);
+
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -106,6 +112,15 @@ public class Client {
 				String db = parsedCSV[1];
 				int key = Integer.parseInt(parsedCSV[2]);
 				getCmd(db, key, client);
+			} else if (cmd.equals("getA")) {
+				String db = parsedCSV[1];
+				String keyStr = parsedCSV[2];
+				String[] keys = keyStr.split(",");
+				Integer[] keyArr = new Integer[keys.length];
+				for (int i = 0; i < keys.length; i++) {
+					keyArr[i] = Integer.parseInt(keys[i]);
+				}
+				getACmd(db, keyArr, client);
 			} else if (cmd.equals("createdb")) {
 				String db = parsedCSV[1];
 				createDB(db, client);
@@ -115,7 +130,25 @@ public class Client {
 			}
 		} catch (XmlRpcException ex) {
 			String mess = ex.getMessage();
-			System.out.println("<< " +mess);
+			System.out.println("<< " + mess);
+		}
+	}
+
+	private static void getACmd(String db, Integer[] keys, XmlRpcClient dbs)
+			throws XmlRpcException {
+		System.out.print(">>> get records with keys \"");
+		for (int i = 0; i < keys.length - 1; i++) {
+			System.out.print(keys[i] + ",");
+		}
+		System.out.println(keys[keys.length - 1] + "\" from database \'" + db
+				+ "\'");
+		Object[] parm = { db, keys };
+		Object[] recordsTmp = (Object[]) dbs.execute("db.getA", parm);
+		for (Object dbrTmp : recordsTmp) {
+			DBRecord dbr = (DBRecord) dbrTmp;
+			System.out.println("<<< record from database \"" + db
+					+ "\" with key \"" + dbr.getKey() + "\" --> [ \""
+					+ dbr.getMessage() + "\" ]");
 		}
 	}
 
@@ -126,11 +159,12 @@ public class Client {
 	 *            database name
 	 * @param dbs
 	 *            database server object
-	 * @throws XmlRpcException 
+	 * @throws XmlRpcException
 	 */
-	private static void createDB(String db, XmlRpcClient dbs) throws XmlRpcException {
-			Object[] parm = {db};
-			dbs.execute("db.createDB",parm);
+	private static void createDB(String db, XmlRpcClient dbs)
+			throws XmlRpcException {
+		Object[] parm = { db };
+		dbs.execute("db.createDB", parm);
 	}
 
 	/**
@@ -142,15 +176,17 @@ public class Client {
 	 *            record key
 	 * @param dbs
 	 *            database server object
-	 * @throws XmlRpcException 
+	 * @throws XmlRpcException
 	 * @throws RemoteException
 	 */
-	private static void getCmd(String db, int key, XmlRpcClient dbs) throws XmlRpcException
-			 {
-			Object[] parm = {db, key};
-			DBRecord dbRec = (DBRecord) dbs.execute("db.get",parm);
-			System.out.println("<<< record from database \"" + db
-					+ "\" with key \"" + key + "\" --> [ " + dbRec + " ]");
+	private static void getCmd(String db, int key, XmlRpcClient dbs)
+			throws XmlRpcException {
+		System.out.println(">>> get record with key \"" + key
+				+ "\" from database \'" + db + "\'");
+		Object[] parm = { db, key };
+		DBRecord dbRec = (DBRecord) dbs.execute("db.get", parm);
+		System.out.println("<<< record from database \"" + db
+				+ "\" with key \"" + key + "\" --> [ \"" + dbRec.getMessage() + "\" ]");
 
 	}
 
@@ -166,14 +202,14 @@ public class Client {
 	 * @param dbs
 	 *            - dbs object
 	 * @throws RemoteException
-	 * @throws XmlRpcException 
+	 * @throws XmlRpcException
 	 */
 	private static void updateCmd(String db, int key, String message,
 			XmlRpcClient dbs) throws XmlRpcException {
-			System.out.println(">> Updating record \"" + key
-					+ "\" in database \"" + db + "\" with \"" + message + "\"");
-			Object[] parm = {db, key, message};
-			dbs.execute("db.update",parm);
+		System.out.println(">> Updating record \"" + key + "\" in database \""
+				+ db + "\" with \"" + message + "\"");
+		Object[] parm = { db, key, message };
+		dbs.execute("db.update", parm);
 	}
 
 	/**
@@ -184,16 +220,16 @@ public class Client {
 	 * @param message
 	 * @param dbs
 	 * @throws RemoteException
-	 * @throws XmlRpcException 
+	 * @throws XmlRpcException
 	 */
 	private static void insertCmd(String db, int key, String message,
 			XmlRpcClient dbs) throws XmlRpcException {
 
-			System.out.println(">> Inserting into database \"" + db
-					+ "\" record[ " + message + " ]");
-			
-			Object[] parm = {db, key, message};
-			dbs.execute("db.insert",parm);
+		System.out.println(">> Inserting into database \"" + db + "\" record[ "
+				+ message + " ]");
+
+		Object[] parm = { db, key, message };
+		dbs.execute("db.insert", parm);
 
 	}
 
@@ -201,15 +237,15 @@ public class Client {
 	 * Print list db command
 	 * 
 	 * @param dbs
-	 * @throws XmlRpcException 
+	 * @throws XmlRpcException
 	 */
 	private static void listDB(XmlRpcClient dbs) throws XmlRpcException {
 		System.out.println(">> listdb");
 		Object[] parm = {};
-		Object[] dbListO =(Object[]) dbs.execute("db.listDB",parm);
+		Object[] dbListO = (Object[]) dbs.execute("db.listDB", parm);
 		StringBuilder strb = new StringBuilder();
 		strb.append("<< Databases:");
-		
+
 		for (Object dbName : dbListO) {
 			strb.append("'" + dbName + "' ");
 		}

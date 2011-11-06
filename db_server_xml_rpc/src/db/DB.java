@@ -2,9 +2,11 @@ package db;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
+import java.io.FileInputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Collections;
 import db.DBRecord;
@@ -69,7 +71,10 @@ public class DB {
 				// v > key
 				high = i - 1;
 		}
-
+		
+		//wait it the record is locked (for update)
+		while(retDb != null && retDb.isLocked());
+		
 		return retDb;
 	}
 
@@ -88,11 +93,12 @@ public class DB {
 		DBRecord dbr = this.findDbRec(key);
 		if (dbr == null)
 			throw new KeyNotFoundException("Key:" + key
-					+ " wasn't found in the database.");
-
-		// we have db record
+					+ " wasn't found in the database.",key);
+		
+		dbr.lockRecord();
 		dbr.setMessage(message);
-
+		dbr.unlockRecord();
+		
 		return retval;
 	}
 
