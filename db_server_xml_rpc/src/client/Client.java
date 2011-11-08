@@ -238,6 +238,7 @@ public class Client {
 
 		Object[] parm = { db, key, message };
 		dbs.execute("db.insert", parm);
+		System.out.println("Database \""+db+"\" - record inserted");
 
 	}
 

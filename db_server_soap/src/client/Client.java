@@ -127,12 +127,12 @@ public class Client {
 			}
 		} catch (AxisFault ex) {
 			String mess = ex.getMessage();
-			System.out.println("<< " + mess);
+			System.out.println(mess);
 		}
 	}
 
 	private static void getACmd(String db, Integer[] keys) throws AxisFault {
-		System.out.print(">>> get records with keys \"");
+		System.out.print(">> get records with keys \"");
 		for (int i = 0; i < keys.length - 1; i++) {
 			System.out.print(keys[i] + ",");
 		}
@@ -199,9 +199,11 @@ public class Client {
 		retEle.detach();
 		
 		//System.out.println(retEle);
+		System.out.println(">> Creating database - \""+db+"\"");
 		OMElement revValEle = (OMElement) retEle.getChildElements().next();
 		String text = revValEle.getText();
 		int retVal = Integer.parseInt(text);
+		System.out.println("<< Database \""+db+"\" created.");
 	}
 
 	/**
@@ -218,7 +220,7 @@ public class Client {
 	 * @throws RemoteException
 	 */
 	private static void getCmd(String db, int key) throws AxisFault {
-		System.out.println(">>> get record with key \"" + key
+		System.out.println(">> get record with key \"" + key
 				+ "\" from database \'" + db + "\'");
 		//create tree (db,key)
 		OMElement method = fac.createOMElement("get",omNs);
@@ -239,7 +241,7 @@ public class Client {
 		
 		String[] csv = csvResEle.getText().replaceAll("\"", "").split(";");
 		
-		System.out.println("<<< record from database \"" + db
+		System.out.println("<< record from database \"" + db
 				+ "\" with key \"" + key + "\" --> [ \"" + csv[3] + "\" ]");
 
 	}
@@ -281,6 +283,7 @@ public class Client {
 		OMElement retValEle = sender.sendReceive(method);
 		retValEle.build();
 		retValEle.detach();
+		System.out.println("<< DB \""+db+"\" - record updated.");
 	}
 
 	/**
@@ -327,6 +330,7 @@ public class Client {
 		String retText = retEle.getText();
 		//System.out.println(retText);
 		//int retVal = Integer.parseInt(retText);
+		System.out.println("Database \""+db+"\" - record inserted");
 	}
 
 	/**

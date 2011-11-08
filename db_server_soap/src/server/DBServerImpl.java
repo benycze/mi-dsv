@@ -64,7 +64,7 @@ public class DBServerImpl implements DBServer {
 		if (this.dbExists(dbName) != null) {
 			// database doesn't exist
 			throw new DBExistsException(
-					"Database with this name allready exists.");
+					"<< ERROR - Database with this name allready exists.");
 		} else {
 			// create new DB
 			DB newDB = new DB(dbName);
@@ -82,11 +82,11 @@ public class DBServerImpl implements DBServer {
 		DB db = null;
 		db = this.dbExists(dbname);
 		if (db == null)
-			throw new DBNotFoundException("Database not found.");
+			throw new DBNotFoundException("<< ERROR - Database "+dbname+" does not exists.");
 		// here db exists
 		DBRecord dbr = db.findDbRec(key);
 		if(dbr == null){
-			throw new KeyNotFoundException("Key:" + key
+			throw new KeyNotFoundException("<< ERROR - Key:" + key
 					+ " wasn't found in the database.",key);
 		}
 		
@@ -99,7 +99,7 @@ public class DBServerImpl implements DBServer {
 		DB db = null;
 		db = this.dbExists(dbname);
 		if (db == null)
-			throw new DBNotFoundException("Database not found.");
+			throw new DBNotFoundException("<< ERROR - Database "+dbname+" does not exists.");
 		// ////////////////////////////
 		// here exists database
 		int size = key.length;
@@ -108,7 +108,7 @@ public class DBServerImpl implements DBServer {
 			int keyNum = key[i];
 			DBRecord tmpRec = db.findDbRec(keyNum);
 			if(tmpRec == null){
-				throw new KeyNotFoundException("Key:" + keyNum
+				throw new KeyNotFoundException("<< ERROR - Key:" + keyNum
 					+ " wasn't found in the database.",keyNum);
 			}
 			dbRecords[i] = tmpRec;
@@ -123,7 +123,7 @@ public class DBServerImpl implements DBServer {
 		DB db = null;
 		db = this.dbExists(dbname);
 		if (db == null)
-			throw new DBNotFoundException("Database not found.");
+			throw new DBNotFoundException("<< ERROR - Database "+dbname+" does not exists.");
 		// ///////////////////////////////////
 		// db exists --> insert data
 		db.insertNewRecord(key, message);
@@ -154,7 +154,7 @@ public class DBServerImpl implements DBServer {
 		DB db = null;
 		db = this.dbExists(dbname);
 		if (db == null)
-			throw new DBNotFoundException("Database not found.");
+			throw new DBNotFoundException("<< ERROR - Database "+dbname+" does not exists.");
 		// //////////////////////////////////////////////////////////////////
 		db.updateDbRec(key, message);
 		// TODO ret hodnoty!!

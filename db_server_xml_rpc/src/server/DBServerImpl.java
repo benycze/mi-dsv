@@ -86,7 +86,7 @@ public class DBServerImpl implements DBServer {
 		// here db exists
 		DBRecord dbr = db.findDbRec(key);
 		if(dbr == null){
-			throw new KeyNotFoundException("Key:" + key
+			throw new KeyNotFoundException("<< ERROR - Key:" + key
 					+ " wasn't found in the database.",key);
 		}
 		
@@ -108,7 +108,7 @@ public class DBServerImpl implements DBServer {
 			int keyNum = key[i];
 			DBRecord tmpRec = db.findDbRec(keyNum);
 			if(tmpRec == null){
-				throw new KeyNotFoundException("Key:" + keyNum
+				throw new KeyNotFoundException("<< ERROR - Key:" + keyNum
 					+ " wasn't found in the database.",keyNum);
 			}
 			dbRecords[i] = tmpRec;
