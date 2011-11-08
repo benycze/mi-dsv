@@ -136,20 +136,25 @@ public class Client {
 
 	private static void getACmd(String db, Integer[] keys, XmlRpcClient dbs)
 			throws XmlRpcException {
-		System.out.print(">>> get records with keys \"");
+		System.out.print(">> get records with keys \"");
 		for (int i = 0; i < keys.length - 1; i++) {
 			System.out.print(keys[i] + ",");
 		}
 		System.out.println(keys[keys.length - 1] + "\" from database \'" + db
 				+ "\'");
-		Object[] parm = { db, keys };
-		Object[] recordsTmp = (Object[]) dbs.execute("db.getA", parm);
-		for (Object dbrTmp : recordsTmp) {
-			DBRecord dbr = (DBRecord) dbrTmp;
-			System.out.println("<<< record from database \"" + db
+		
+		StringBuilder strb = new StringBuilder();
+		for(Integer key:keys){
+			Object[] parm = {db,key};
+			Object recordsTmp = (Object) dbs.execute("db.get", parm);
+		
+			DBRecord dbr = (DBRecord) recordsTmp;
+			strb.append("<< record from database \"" + db
 					+ "\" with key \"" + dbr.getKey() + "\" --> [ \""
-					+ dbr.getMessage() + "\" ]");
+					+ dbr.getMessage() + "\" ]\n");
 		}
+		System.out.println(strb.toString());
+		
 	}
 
 	/**
@@ -163,8 +168,10 @@ public class Client {
 	 */
 	private static void createDB(String db, XmlRpcClient dbs)
 			throws XmlRpcException {
+		System.out.println(">> Creating database - \""+db+"\"");
 		Object[] parm = { db };
 		dbs.execute("db.createDB", parm);
+		System.out.println("<< Database \""+db+"\" created.");
 	}
 
 	/**
@@ -181,11 +188,11 @@ public class Client {
 	 */
 	private static void getCmd(String db, int key, XmlRpcClient dbs)
 			throws XmlRpcException {
-		System.out.println(">>> get record with key \"" + key
+		System.out.println(">> get record with key \"" + key
 				+ "\" from database \'" + db + "\'");
 		Object[] parm = { db, key };
 		DBRecord dbRec = (DBRecord) dbs.execute("db.get", parm);
-		System.out.println("<<< record from database \"" + db
+		System.out.println("<< record from database \"" + db
 				+ "\" with key \"" + key + "\" --> [ \"" + dbRec.getMessage() + "\" ]");
 
 	}
@@ -210,6 +217,7 @@ public class Client {
 				+ db + "\" with \"" + message + "\"");
 		Object[] parm = { db, key, message };
 		dbs.execute("db.update", parm);
+		System.out.println("<< DB \""+db+"\" - record updated.");
 	}
 
 	/**
@@ -225,7 +233,7 @@ public class Client {
 	private static void insertCmd(String db, int key, String message,
 			XmlRpcClient dbs) throws XmlRpcException {
 
-		System.out.println(">> Inserting into database \"" + db + "\" record[ "
+		System.out.println(">> Inserting into database \"" + db + "\" record["
 				+ message + " ]");
 
 		Object[] parm = { db, key, message };

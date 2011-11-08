@@ -64,7 +64,7 @@ public class DBServerImpl implements DBServer {
 		if (this.dbExists(dbName) != null) {
 			// database doesn't exist
 			throw new DBExistsException(
-					"Database with this name allready exists.");
+					"<< Database \""+dbName+"\" allready exists.");
 		} else {
 			// create new DB
 			DB newDB = new DB(dbName);
@@ -82,7 +82,7 @@ public class DBServerImpl implements DBServer {
 		DB db = null;
 		db = this.dbExists(dbname);
 		if (db == null)
-			throw new DBNotFoundException("Database not found.");
+			throw new DBNotFoundException("<< ERROR - Database "+dbname+" does not exists.");
 		// here db exists
 		DBRecord dbr = db.findDbRec(key);
 		if(dbr == null){
@@ -99,7 +99,7 @@ public class DBServerImpl implements DBServer {
 		DB db = null;
 		db = this.dbExists(dbname);
 		if (db == null)
-			throw new DBNotFoundException("Database not found.");
+			throw new DBNotFoundException("<< ERROR - Database "+dbname+" does not exists.");
 		// ////////////////////////////
 		// here exists database
 		int size = key.length;
@@ -123,7 +123,7 @@ public class DBServerImpl implements DBServer {
 		DB db = null;
 		db = this.dbExists(dbname);
 		if (db == null)
-			throw new DBNotFoundException("Database not found.");
+			throw new DBNotFoundException("<< ERROR - Database "+dbname+" does not exists.");
 		// ///////////////////////////////////
 		// db exists --> insert data
 		db.insertNewRecord(key, message);
@@ -154,7 +154,7 @@ public class DBServerImpl implements DBServer {
 		DB db = null;
 		db = this.dbExists(dbname);
 		if (db == null)
-			throw new DBNotFoundException("Database not found.");
+			throw new DBNotFoundException("<< ERROR - Database "+dbname+" does not exists.");
 		// //////////////////////////////////////////////////////////////////
 		db.updateDbRec(key, message);
 		// TODO ret hodnoty!!

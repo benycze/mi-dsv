@@ -92,7 +92,7 @@ public class DB {
 		int retval = 0;
 		DBRecord dbr = this.findDbRec(key);
 		if (dbr == null)
-			throw new KeyNotFoundException("Key:" + key
+			throw new KeyNotFoundException("<< ERROR - Key:" + key
 					+ " wasn't found in the database.",key);
 		
 		dbr.lockRecord();
@@ -143,7 +143,7 @@ public class DB {
 		DBRecord dbr = this.findDbRec(key);
 		if (dbr != null)
 			throw new DuplicateKeyException(
-					"Key with this value allready exists");
+					"ERROR - Key with this value allready exists");
 		// --- key doesn't exist
 		dbr = new DBRecord(key, message);
 		this.dbRecList.add(dbr);
