@@ -233,8 +233,8 @@ public class Client {
 	private static void insertCmd(String db, int key, String message,
 			XmlRpcClient dbs) throws XmlRpcException {
 
-		System.out.println(">> Inserting into database \"" + db + "\" record["
-				+ message + " ]");
+		System.out.println(">> Inserting into database \"" + db + "\" record[ "
+				+ "\""+key+"\";\""+message + "\" ]");
 
 		Object[] parm = { db, key, message };
 		dbs.execute("db.insert", parm);

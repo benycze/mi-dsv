@@ -154,7 +154,9 @@ public class Client {
 	private static void createDb(String db, DBServer dbs)
 			throws RemoteException {
 		try {
+			System.out.println(">> Createdb \""+db+"\"");
 			dbs.createDB(db);
+			System.out.println("<< Database \""+db+"\" created.");
 		} catch (DBExistsException ex) {
 			System.out.println(">> ERROR - database with name \"" + db
 					+ "\" allready exists.");
@@ -176,9 +178,9 @@ public class Client {
 	private static void getCmd(String db, int key, DBServer dbs)
 			throws RemoteException {
 		try {
-			System.out.println(">>> get record with key \""+key+"\" from database \'"+db+"\'");
+			System.out.println(">> get record with key \""+key+"\" from database \'"+db+"\'");
 			DBRecord dbRec = dbs.get(db, key);
-			System.out.println("<<< record from database \"" + db
+			System.out.println("<< record from database \"" + db
 					+ "\" with key \"" + key + "\" --> [ \"" + dbRec.getMessage() + "\" ]");
 		} catch (DBNotFoundException e) {
 			System.out.println(">> ERROR - database " + "'" + db
@@ -208,6 +210,7 @@ public class Client {
 			System.out.println(">> Updating record \"" + key
 					+ "\" in database \"" + db + "\" with \"" + message + "\"");
 			dbs.update(db, key, message);
+			System.out.println("<< DB \""+db+"\" - record updated");
 		} catch (DBNotFoundException e) {
 			System.out.println(">> ERROR - database " + "'" + db
 					+ "' does not exist.");
@@ -230,8 +233,8 @@ public class Client {
 	private static void insertCmd(String db, int key, String message,
 			DBServer dbs) throws RemoteException {
 		try {
-			System.out.println(">> Inserting into database \"" + db
-					+ "\" record[ \"" + message + "\" ]");
+			System.out.println(">> Inserting into database \"" + db + "\" record[ "
+					+ "\""+key+"\";\""+message + "\" ]");
 			dbs.insert(db, key, message);
 		} catch (DBNotFoundException e) {
 			System.out.println("<< ERROR - database \"" + db

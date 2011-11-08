@@ -300,7 +300,7 @@ public class Client {
 	private static void insertCmd(String db, int key, String message) throws AxisFault {
 
 		System.out.println(">> Inserting into database \"" + db + "\" record[ "
-				+ message + " ]");
+				+ "\""+key+"\";\""+message + "\" ]");
 
 		OMElement method = fac.createOMElement("insert",omNs);
 		OMElement gname = fac.createOMElement("gname",omNs);
