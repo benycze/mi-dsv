@@ -191,10 +191,11 @@ public class Server implements DBServerSoapInterface{
 		String[] dbNames = serverUI.listDB();
 		//napl uzel s potomkama
 		for(String dbName:dbNames){
-			root.addChild(fac.createOMText(root,dbName));
+			OMElement dbEle = fac.createOMElement("db",omNs);
+			dbEle.addChild(fac.createOMText(root,dbName));
+			root.addChild(dbEle);
 			System.out.println("\t--> "+dbName);
 		}
-		//root.addChild(val);
 		
 		System.out.println(root);
 		//.. a vrat cely uzel

@@ -1,0 +1,8 @@
+databazova aplikace pomoci technologie CORBA. Root souboru obsahuje projekt pro prostředí eclipse.
+
+Vstupy jsou implmenetovany dle pozadavku na jadro.
+
+-------------------------------------------------
+spusteni serveru pomoci server.sh --> spusti CORBA server
+spusteni ORB daemona run_ORBD.sh --> spusti ORB daemona
+spustine clienta pomoci client.sh --> spusteni klienta 

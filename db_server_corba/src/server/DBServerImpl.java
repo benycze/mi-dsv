@@ -2,16 +2,11 @@ package server;
 
 import java.io.File;
 import java.io.FilenameFilter;
-import java.rmi.RemoteException;
 import java.util.ArrayList;
 
 import compute.DBServer;
 import db.DB;
-import db.DBRecord;
-import exceptions.DBExistsException;
-import exceptions.DBNotFoundException;
-import exceptions.DuplicateKeyException;
-import exceptions.KeyNotFoundException;
+import Generated.*;
 
 public class DBServerImpl implements DBServer {
 
@@ -58,13 +53,14 @@ public class DBServerImpl implements DBServer {
 
 	/**
 	 * Create a database with this name
+	 * @throws DBExistsException 
 	 */
 	@Override
 	public boolean createDB(String dbName) throws DBExistsException {
 		if (this.dbExists(dbName) != null) {
 			// database doesn't exist
 			throw new DBExistsException(
-					"<< ERROR - Database with this name allready exists.");
+					"Database with this name allready exists.");
 		} else {
 			// create new DB
 			DB newDB = new DB(dbName);
@@ -77,43 +73,54 @@ public class DBServerImpl implements DBServer {
 	 * Returns one record
 	 */
 	@Override
-	public DBRecord get(String dbname, Integer key) throws DBNotFoundException,
+	public Generated.DBRecord get(String dbname, Integer key) throws DBNotFoundException,
 			KeyNotFoundException {
-		DB db = null;
+		db.DB db = null;
 		db = this.dbExists(dbname);
 		if (db == null)
-			throw new DBNotFoundException("<< ERROR - Database "+dbname+" does not exists.");
+			throw new DBNotFoundException("Database not found.");
 		// here db exists
-		DBRecord dbr = db.findDbRec(key);
+		db.DBRecord dbr = db.findDbRec(key);
 		if(dbr == null){
-			throw new KeyNotFoundException("<< ERROR - Key: " + key
+			throw new KeyNotFoundException("Key:" + key
 					+ " wasn't found in the database.",key);
 		}
 		
-		return dbr;
+		Generated.DBRecord dbrc = new Generated.DBRecord();
+		dbrc.key = dbr.getKey();
+		dbrc.message = dbr.getMessage();
+		dbrc.tscreate = dbr.getTscreate();
+		dbrc.tsmodify = dbr.getTsmodify();
+		
+		return dbrc;
 	}
 
 	@Override
-	public DBRecord[] getA(String dbname, Integer[] key)
+	public Generated.DBRecord[] getA(String dbname, int[] key)
 			throws DBNotFoundException, KeyNotFoundException {
 		DB db = null;
 		db = this.dbExists(dbname);
 		if (db == null)
-			throw new DBNotFoundException("<< ERROR - Database "+dbname+" does not exists.");
+			throw new DBNotFoundException("Database not found.");
 		// ////////////////////////////
 		// here exists database
 		int size = key.length;
-		DBRecord[] dbRecords = new DBRecord[size];
+		Generated.DBRecord[] dbRecords = new Generated.DBRecord[size];
 		for (int i = 0; i < size; i++) {
 			int keyNum = key[i];
-			DBRecord tmpRec = db.findDbRec(keyNum);
+			db.DBRecord tmpRec = db.findDbRec(keyNum);
 			if(tmpRec == null){
-				throw new KeyNotFoundException("<< ERROR - Key:" + keyNum
+				throw new KeyNotFoundException("Key:" + keyNum
 					+ " wasn't found in the database.",keyNum);
 			}
-			dbRecords[i] = tmpRec;
+			Generated.DBRecord corbaDB= new Generated.DBRecord();
+			corbaDB.key = tmpRec.getKey();
+			corbaDB.message = tmpRec.getMessage();
+			corbaDB.tscreate = tmpRec.getTscreate();
+			corbaDB.tsmodify = tmpRec.getTsmodify();
+			
+			dbRecords[i] = corbaDB;
 		}
-
 		return dbRecords;
 	}
 
@@ -123,7 +130,7 @@ public class DBServerImpl implements DBServer {
 		DB db = null;
 		db = this.dbExists(dbname);
 		if (db == null)
-			throw new DBNotFoundException("<< ERROR - Database "+dbname+" does not exist.");
+			throw new DBNotFoundException("Database not found.");
 		// ///////////////////////////////////
 		// db exists --> insert data
 		db.insertNewRecord(key, message);
@@ -154,7 +161,7 @@ public class DBServerImpl implements DBServer {
 		DB db = null;
 		db = this.dbExists(dbname);
 		if (db == null)
-			throw new DBNotFoundException("<< ERROR - Database "+dbname+" does not exists.");
+			throw new DBNotFoundException("Database not found.");
 		// //////////////////////////////////////////////////////////////////
 		db.updateDbRec(key, message);
 		// TODO ret hodnoty!!
@@ -185,7 +192,6 @@ public class DBServerImpl implements DBServer {
 	@Override
 	public void flush() {
 		for (DB database : this.dbList) {
-			System.out.println("Flushing data on disk.");
 			database.flush();
 		}
 	}

@@ -156,7 +156,7 @@ public class Client {
 			keysEle.addChild(keySum);
 		}
 		
-		System.out.println(method);
+		//System.out.println(method);
 		OMElement retVal = sender.sendReceive(method);
 		retVal.build();
 		retVal.detach();
@@ -164,12 +164,13 @@ public class Client {
 		
 		while (i.hasNext()) {
 			OMElement csvResEle = (OMElement) i.next();
-			String[] csv = csvResEle.toString().toString().replaceAll("\"", "").split(";");
+			
+			String[] csv = csvResEle.getText().replaceAll("\"", "").split(";");
 			
 			String key = csv[2];
 			String message = csv[3];
 			
-			System.out.println("<<< record from database \"" + db
+			System.out.println("<< record from database \"" + db
 					+ "\" with key \"" + key + "\" --> [ \""
 					+ message + "\" ]");
 		}
@@ -199,7 +200,7 @@ public class Client {
 		retEle.detach();
 		
 		//System.out.println(retEle);
-		System.out.println(">> Creating database - \""+db+"\"");
+		//System.out.println(">> Creating database - \""+db+"\"");
 		OMElement revValEle = (OMElement) retEle.getChildElements().next();
 		String text = revValEle.getText();
 		int retVal = Integer.parseInt(text);
@@ -323,14 +324,14 @@ public class Client {
 		retValEle.build();
 		retValEle.detach();
 		
-		System.out.println(retValEle);
+		//System.out.println(retValEle);
 		
 		OMElement retEle = (OMElement) retValEle.getFirstElement().getFirstElement();
 		//System.out.println(retEle);
 		String retText = retEle.getText();
 		//System.out.println(retText);
 		//int retVal = Integer.parseInt(retText);
-		System.out.println("Database \""+db+"\" - record inserted");
+		System.out.println("DB \""+db+"\" - record inserted");
 	}
 
 	/**
@@ -347,8 +348,8 @@ public class Client {
 		result.build();
 		result.detach();
 		
-		Iterator i = result.getFirstElement().getChildElements();
-		
+		Iterator i = result.getFirstElement().getFirstElement().getChildElements();
+		//System.out.println(result.getFirstElement().getFirstElement());
 		StringBuilder strb = new StringBuilder();
 		strb.append("<< Databases:");
 		while (i.hasNext()) {
