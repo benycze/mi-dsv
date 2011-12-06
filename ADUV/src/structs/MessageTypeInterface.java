@@ -17,6 +17,7 @@ public interface MessageTypeInterface {
       TOKEN,
       GET_WORK,
       STOP,
-      WORK_TERMINATED
-      }
+      WORK_TERMINATED,
+      IDLE
+    }
 }

@@ -15,7 +15,6 @@ import java.rmi.server.UnicastRemoteObject;
 import java.util.LinkedList;
 import java.util.Queue;
 import java.util.Random;
-import org.omg.PortableInterceptor.ACTIVE;
 import structs.Message;
 import structs.MessageTypeInterface;
 import structs.NodeInfo;
@@ -83,6 +82,12 @@ public class NodeCore extends UnicastRemoteObject implements NodeInterface,Seria
      */
     private boolean startTokenSent;
     
+    /**
+     * Logical clock of the process
+     * -> incremented with send process
+     */
+    private int clock;
+    
     public void setRegistry(Registry registry) {
         this.registry = registry;
     }
@@ -113,6 +118,8 @@ public class NodeCore extends UnicastRemoteObject implements NodeInterface,Seria
         //4]token start
         this.startTokenSent = false;
         this.workStopAccepted = false;
+        //5]init clocks
+        this.clock = 0;
     }
     
     /**
@@ -186,33 +193,40 @@ public class NodeCore extends UnicastRemoteObject implements NodeInterface,Seria
         while(!this.messageQueue.isEmpty()){
             Message mess = this.messageQueue.poll();
             MessageType type = mess.getType();
+            //synchronize my logical time
+            this.setNewClock(mess.getClock());
+            
             switch(type){
                 case START:
                     this.log.logNode("Starting work ...", -1, this.nodeInfo.getID());
                     this.workAmount = new Random().nextInt(SLEEP_TIME_MODULE);
-                    this.log.logNode("Generated work amount is "+this.workAmount+".", -1, this.nodeInfo.getID());
+                    this.log.logNode("Generated work amount is "+this.workAmount+".", clock, this.nodeInfo.getID());
                     this.workStopAccepted = true;
                     break;
                     
                 case GET_WORK: //some work with random time
-                    this.log.logNode("Work has been received: "+mess.toString()+".", -1, this.nodeInfo.getID());
+                    this.log.logNode("Work has been received: "+mess.toString()+".", clock, this.nodeInfo.getID());
                     this.workAmount  += Integer.parseInt(mess.getPayload());
-                    this.log.logNode("New work amount is "+this.workAmount+".", -1, this.nodeInfo.getID());
+                    this.log.logNode("New work amount is "+this.workAmount+".", clock, this.nodeInfo.getID());
                     break;
                     
                 case TOKEN:
-                    this.log.logNode("Token has been received "+mess.toString(), -1, this.nodeInfo.getID());
+                    this.log.logNode("Token has been received "+mess.toString(), clock, this.nodeInfo.getID());
                     processToken(mess);
                     break;
                     
                 case STOP:
                     this.directory.logout(this.nodeInfo);
-                    this.log.logNode("Exiting", -1, this.nodeInfo.getID());
+                    this.log.logNode("Exiting", clock, this.nodeInfo.getID());
                     System.exit(0);
                     break;
                 case WORK_TERMINATED:
-                    this.log.logNode("Work has been terminated :).", -1, this.nodeInfo.getID());
+                    this.log.logNode("Work has been terminated :).", clock, this.nodeInfo.getID());
                     this.init();
+                    break;
+               default:
+                   //do nothing by default
+                   break;
             }
         }
     }
@@ -236,7 +250,7 @@ public class NodeCore extends UnicastRemoteObject implements NodeInterface,Seria
             }
             
             //log it
-            this.log.logNode("Working :  "+oldWork+"->"+this.workAmount+".", -1, this.nodeInfo.getID());
+            this.log.logNode("Working :  "+oldWork+"->"+this.workAmount+".", clock, this.nodeInfo.getID());
                 
                 ///////////////////////////////////////////////////////
                 //if some work has been sent -> end it
@@ -263,12 +277,12 @@ public class NodeCore extends UnicastRemoteObject implements NodeInterface,Seria
                 int RandomWork = new Random().nextInt(SLEEP_TIME_MODULE);
                 Message workMess = new Message(MessageType.GET_WORK, -1, Color.WHITE,Integer.toString(RandomWork));
                 sendMessageToProcess(workMess,randInd);
-                this.log.logNode("Sending work to "+randInd+"->"+workMess.toString()+".", -1, this.nodeInfo.getID());
+                this.log.logNode("Work has been sent to "+randInd+"->"+workMess.toString()+".", clock, this.nodeInfo.getID());
                 
                 //change my color -> if you are sending to the host with lower id
                 if(this.nodeInfo.getID() > randInd){
                     this.myColor = Color.BLACK;
-                    this.log.logNode("Receiver id was smaller than mine -> I become to be BLACK.", -1, this.nodeInfo.getID());
+                    this.log.logNode("Receiver ID was smaller than mine -> I become to be BLACK.", clock, this.nodeInfo.getID());
                 }
                 
             }
@@ -279,13 +293,18 @@ public class NodeCore extends UnicastRemoteObject implements NodeInterface,Seria
     }
 
     /**
-     * This method sends a message to the process
+     * This method sends a message to the process; this process also sets logical clock
      * @param workMess
      * @param address 
      */
     private void sendMessageToProcess(Message workMess,int address) throws RemoteException, NotBoundException {
-        this.log.logNode("Sending message to processs "+address+"-->"+workMess.toString(), -1, this.nodeInfo.getID());
         String nodeName = NODE_NAME_PREFIX+address;
+        //set clock
+        this.clock ++; //increment clock
+        workMess.setClock(clock);
+        
+        //message prepared
+        this.log.logNode("Sending message to processs "+address+"-->"+workMess.toString(), clock, this.nodeInfo.getID());
         NodeInterface nodeDirectory = 
                 (NodeInterface)this.registry.lookup(nodeName);
         nodeDirectory.putMessage(workMess);
@@ -298,13 +317,13 @@ public class NodeCore extends UnicastRemoteObject implements NodeInterface,Seria
     private void processToken(Message mess) throws RemoteException, NotBoundException {
         Message outMess = new Message();
         outMess.setType(MessageType.TOKEN);
-        this.log.logNode("Received message -> "+mess.toString(),-1, 0);
+        this.log.logNode("Received message -> "+mess.toString(),clock, 0);
         
         if(mess.getColor() == Color.BLACK){
             //black token
             if(this.nodeInfo.getID() == 0){
                 //primary process
-                this.log.logNode("BLACK node has been received.",-1, 0);
+                this.log.logNode("BLACK node has been received.",clock, 0);
                 this.startTokenSent = false;
             }else{
                 outMess.setColor(Color.BLACK);
@@ -314,7 +333,7 @@ public class NodeCore extends UnicastRemoteObject implements NodeInterface,Seria
             
             if(this.nodeInfo.getID() == 0){
                 //primary process --> received white node;all stops working
-                this.log.logNode("Work has been terminated :).", -1, 0);
+                this.log.logNode("Work has been terminated :).", clock, 0);
                 sendTerminatedMessage();
                 this.init();
             }else{
@@ -380,7 +399,7 @@ public class NodeCore extends UnicastRemoteObject implements NodeInterface,Seria
             mess.setType(MessageType.TOKEN);
             mess.setColor(Color.WHITE);
             this.sendMessageToProcess(mess, neighbourID);
-            this.log.logNode("Sending TOKEN.", -1, this.nodeInfo.getID());
+            this.log.logNode("Sending TOKEN.", clock, this.nodeInfo.getID());
         }
     }
 
@@ -396,7 +415,8 @@ public class NodeCore extends UnicastRemoteObject implements NodeInterface,Seria
         this.workSent = false;
         this.myColor = Color.WHITE;
         this.workStopAccepted = false;
-        this.log.logNode("Node initialized.", -1, this.nodeInfo.getID());
+        this.clock = 0;
+        this.log.logNode("Node initialized.", clock, this.nodeInfo.getID());
     }
 
     /**
@@ -405,10 +425,19 @@ public class NodeCore extends UnicastRemoteObject implements NodeInterface,Seria
     private void sendTerminatedMessage() throws RemoteException, NotBoundException {
         Message messTerm=new Message();
         messTerm.setType(MessageType.WORK_TERMINATED);
-        this.log.logNode("Sending termination message to all nodes.", -1, this.nodeInfo.getID());
+        this.log.logNode("Sending termination message to all nodes.", clock, this.nodeInfo.getID());
         
         for(NodeInfo node : this.directory.listNodes()){    
                 this.sendMessageToProcess(messTerm, node.getID());
+        }
+    }
+    
+    /**
+     * This method sets new clock time from the message
+     */
+    public void setNewClock(int messageTime){
+        if(messageTime >= this.clock){
+            this.clock = messageTime + 1;
         }
     }
     

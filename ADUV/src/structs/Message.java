@@ -28,9 +28,18 @@ public class Message implements Serializable,MessageTypeInterface,
      */
     private Color color;
     
-    
+    /**
+     * Payload of the message
+     */
     String payload;
 
+    /**
+     * Parameterized constructor
+     * @param type - type of the message
+     * @param clock - clock value
+     * @param color - message color it token is generated
+     * @param strPayload - payload message
+     */
     public Message(MessageType type, int clock, Color color, String strPayload) {
         this.type = type;
         this.clock = clock;
@@ -38,8 +47,14 @@ public class Message implements Serializable,MessageTypeInterface,
         this.payload = strPayload;
     }
 
+    /**
+     * Explicit constructor
+     */
     public Message() {
-        
+        this.payload = "";
+        this.clock = 0;
+        this.color = Color.WHITE;
+        this.type = MessageType.IDLE;
     }
 
     /*
@@ -54,9 +69,6 @@ public class Message implements Serializable,MessageTypeInterface,
         return color;
     }
 
-    public String getStrPayload() {
-        return payload;
-    }
 
     public String getPayload() {
         return payload;
@@ -78,17 +90,13 @@ public class Message implements Serializable,MessageTypeInterface,
         this.color = color;
     }
 
-    public void setStrPayload(String payload) {
-        this.payload = payload;
-    }
-
     public void setType(MessageType type) {
         this.type = type;
     }
 
     @Override
     public String toString() {
-        return ("["+type+";"+color+";"+payload+"]");
+        return ("[Type="+type+";Color="+color+";Payload="+payload+";Clock="+clock+"]");
     }
 
 }
