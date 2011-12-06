@@ -317,7 +317,7 @@ public class NodeCore extends UnicastRemoteObject implements NodeInterface,Seria
     private void processToken(Message mess) throws RemoteException, NotBoundException {
         Message outMess = new Message();
         outMess.setType(MessageType.TOKEN);
-        this.log.logNode("Received message -> "+mess.toString(),clock, 0);
+        this.log.logNode("Received message -> "+mess.toString(),clock, this.nodeInfo.getID());
         
         if(mess.getColor() == Color.BLACK){
             //black token

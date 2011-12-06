@@ -16,7 +16,6 @@ import java.rmi.server.UnicastRemoteObject;
 import java.util.Scanner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import node.NodeCore;
 import structs.Message;
 import structs.MessageTypeInterface.MessageType;
 import structs.NodeInfo;
