@@ -1,1 +1,32 @@
+[-1:1] -> Starting work ...
+[0:1] -> Generated work amount is 30.
+[0:1] -> Working :  30->25.
+[2:1] -> Work has been received: [Type=GET_WORK;Color=WHITE;Payload=48;Clock=1].
+[2:1] -> New work amount is 73.
+[2:1] -> Working :  73->68.
+[3:1] -> Sending message to processs 0-->[Type=GET_WORK;Color=WHITE;Payload=18;Clock=3]
+[3:1] -> Work has been sent to 0->[Type=GET_WORK;Color=WHITE;Payload=18;Clock=3].
+[3:1] -> Receiver ID was smaller than mine -> I become to be BLACK.
+[3:1] -> Working :  68->63.
+[3:1] -> Working :  63->58.
+[3:1] -> Working :  58->53.
+[3:1] -> Working :  53->48.
+[3:1] -> Working :  48->43.
+[3:1] -> Working :  43->38.
+[3:1] -> Working :  38->33.
+[3:1] -> Working :  33->28.
+[3:1] -> Working :  28->23.
+[3:1] -> Working :  23->18.
+[3:1] -> Working :  18->13.
+[3:1] -> Working :  13->8.
+[3:1] -> Working :  8->3.
+[3:1] -> Working :  3->0.
+[6:1] -> Token has been received [Type=TOKEN;Color=WHITE;Payload=;Clock=5]
+[6:1] -> Received message -> [Type=TOKEN;Color=WHITE;Payload=;Clock=5]
+[7:1] -> Sending message to processs 2-->[Type=TOKEN;Color=BLACK;Payload=;Clock=7]
+[14:1] -> Token has been received [Type=TOKEN;Color=WHITE;Payload=;Clock=13]
+[14:1] -> Received message -> [Type=TOKEN;Color=WHITE;Payload=;Clock=13]
+[15:1] -> Sending message to processs 2-->[Type=TOKEN;Color=WHITE;Payload=;Clock=15]
+[23:1] -> Work has been terminated :).
+[0:1] -> Node initialized.
 [0:1] -> Exiting

@@ -1,1 +1,52 @@
+[-1:0] -> Starting work ...
+[0:0] -> Generated work amount is 42.
+[0:0] -> Working :  42->37.
+[1:0] -> Sending message to processs 1-->[Type=GET_WORK;Color=WHITE;Payload=48;Clock=1]
+[1:0] -> Work has been sent to 1->[Type=GET_WORK;Color=WHITE;Payload=48;Clock=1].
+[1:0] -> Working :  37->32.
+[2:0] -> Work has been received: [Type=GET_WORK;Color=WHITE;Payload=52;Clock=1].
+[2:0] -> New work amount is 84.
+[4:0] -> Work has been received: [Type=GET_WORK;Color=WHITE;Payload=18;Clock=3].
+[4:0] -> New work amount is 102.
+[4:0] -> Working :  102->97.
+[4:0] -> Work has been received: [Type=GET_WORK;Color=WHITE;Payload=9;Clock=1].
+[4:0] -> New work amount is 106.
+[4:0] -> Working :  106->101.
+[4:0] -> Working :  101->96.
+[4:0] -> Working :  96->91.
+[4:0] -> Working :  91->86.
+[4:0] -> Working :  86->81.
+[4:0] -> Working :  81->76.
+[4:0] -> Working :  76->71.
+[4:0] -> Working :  71->66.
+[4:0] -> Working :  66->61.
+[4:0] -> Working :  61->56.
+[4:0] -> Working :  56->51.
+[4:0] -> Working :  51->46.
+[4:0] -> Working :  46->41.
+[4:0] -> Working :  41->36.
+[4:0] -> Working :  36->31.
+[4:0] -> Working :  31->26.
+[4:0] -> Working :  26->21.
+[4:0] -> Working :  21->16.
+[4:0] -> Working :  16->11.
+[4:0] -> Working :  11->6.
+[4:0] -> Working :  6->1.
+[4:0] -> Working :  1->0.
+[5:0] -> Sending message to processs 1-->[Type=TOKEN;Color=WHITE;Payload=;Clock=5]
+[5:0] -> Sending TOKEN.
+[12:0] -> Token has been received [Type=TOKEN;Color=BLACK;Payload=;Clock=11]
+[12:0] -> Received message -> [Type=TOKEN;Color=BLACK;Payload=;Clock=11]
+[12:0] -> BLACK node has been received.
+[13:0] -> Sending message to processs 1-->[Type=TOKEN;Color=WHITE;Payload=;Clock=13]
+[13:0] -> Sending TOKEN.
+[20:0] -> Token has been received [Type=TOKEN;Color=WHITE;Payload=;Clock=19]
+[20:0] -> Received message -> [Type=TOKEN;Color=WHITE;Payload=;Clock=19]
+[20:0] -> Work has been terminated :).
+[20:0] -> Sending termination message to all nodes.
+[21:0] -> Sending message to processs 0-->[Type=WORK_TERMINATED;Color=WHITE;Payload=;Clock=21]
+[22:0] -> Sending message to processs 1-->[Type=WORK_TERMINATED;Color=WHITE;Payload=;Clock=22]
+[23:0] -> Sending message to processs 2-->[Type=WORK_TERMINATED;Color=WHITE;Payload=;Clock=23]
+[24:0] -> Sending message to processs 3-->[Type=WORK_TERMINATED;Color=WHITE;Payload=;Clock=24]
+[0:0] -> Node initialized.
 [0:0] -> Exiting

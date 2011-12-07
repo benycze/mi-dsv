@@ -1,1 +1,8 @@
+Assigning ID=0
+Assigning ID=1
+[0]New node detected.
+Assigning ID=2
+[1]New node detected.
+[2]New node detected.
+Assigning ID=3
 [3]New node detected.

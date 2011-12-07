@@ -302,10 +302,10 @@ public class NodeCore extends UnicastRemoteObject implements NodeInterface,Seria
         //1]locate NodeInfo object
         NodeInfo[] nodeInfos = this.directory.listNodes();
         NodeInfo regNode = null;
-        System.out.println("NodeInfoLength = "+nodeInfos.length+"\n"+
-                "Processing nodes:");
+        //System.out.println("NodeInfoLength = "+nodeInfos.length+"\n"+
+        //        "Processing nodes:");
         for(int i=0;i<nodeInfos.length;i++){
-            System.out.println("-->"+nodeInfos[i].toString()+" "+address);
+          //  System.out.println("-->"+nodeInfos[i].toString()+" "+address);
             if(nodeInfos[i].getID() == address){
                 regNode = nodeInfos[i];
             }
