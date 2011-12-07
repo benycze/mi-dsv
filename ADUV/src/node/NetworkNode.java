@@ -2,11 +2,14 @@ package node;
 
 import compute.ADUV_constants;
 import compute.DirectoryInterface;
+import compute.NodeInterface;
+import java.rmi.AlreadyBoundException;
 import java.rmi.NotBoundException;
 import java.rmi.RMISecurityManager;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
+import java.rmi.server.UnicastRemoteObject;
 import structs.NodeInfo;
 import utils.Log;
 
@@ -24,22 +27,24 @@ public class NetworkNode implements ADUV_constants{
     /**
      * @param args the command line arguments
      */
-    public static void main(String[] args) {
-        String IP = "127.0.0.1";
-        int port = DIRECTORY_NAMESPACE_PORT;
+    public static void main(String[] args) throws AlreadyBoundException {
         
-        if(args.length == 1){
-            IP = args[1];
+       //load parameters
+        if(args.length != 4){
+            System.out.println("Not enough parameters.\n"
+                    + "usage: DirIP dirPORT nodeRegIP nodeRegPort");
         }
         
-        if(args.length == 2){
-            IP = args[1];
-            port = Integer.parseInt(args[2]);
-        }
+        String dirIP = args[0];
+        int dirPort = Integer.parseInt(args[1]);
+        
+        String nodeRegIP = args[2];
+        int nodeRegPort = Integer.parseInt(args[3]);
 
-        System.out.println("Starting NODE program ...");
+        System.out.println("Starting NODE program : connecting to "+dirIP+":"+dirPort);
+        System.out.println("Starting registry: "+nodeRegIP+":"+nodeRegPort);
         
-        new NetworkNode().start(IP,port);
+        new NetworkNode().start(dirIP,dirPort,nodeRegIP,nodeRegPort);
     }
 
     //////////////////////////////////////
@@ -68,15 +73,17 @@ public class NetworkNode implements ADUV_constants{
      * @param ip - RMI address
      * @param port - remote port
      */
-    private void start(String ip, int port) {
+    private void start(String dirIp, int dirPort,String nodeRegIP,int nodeRegPort) throws AlreadyBoundException {
         try {
             //1]Get Directory from tracker
-            this.registr = LocateRegistry.getRegistry(ip, port);
+            this.registr = LocateRegistry.getRegistry(dirIp, dirPort);
             this.nodeDirectory = (DirectoryInterface)this.registr.lookup(DIRECTORY_RMI_NAME);
             
-            //2]Create Node information -> ID
+            //2]Create Node information -> ID,IP,PORT
             NodeInfo nodeInformation = new NodeInfo();
             nodeInformation.setID(this.nodeDirectory.getNextID());
+            nodeInformation.setIP(nodeRegIP);
+            nodeInformation.setPort(nodeRegPort);
             
             //3]Create node worker core
             this.nodeCore = new NodeCore(nodeInformation);
@@ -84,10 +91,13 @@ public class NetworkNode implements ADUV_constants{
             //4]Export node core & register in directory
             if (System.getSecurityManager() == null)
                 System.setSecurityManager(new RMISecurityManager());
-            String nodeName = NODE_NAME_PREFIX+nodeInformation.getID();
-            this.registr.rebind(nodeName, this.nodeCore);
-            this.nodeDirectory.login(nodeInformation);
             
+            Registry nodeRegistry = LocateRegistry.createRegistry(nodeRegPort);
+            
+            String nodeName = NODE_NAME_PREFIX+nodeInformation.getID();
+            nodeRegistry.bind(nodeName, this.nodeCore);
+            System.out.println("Node interface exported. Logging into network.");
+            this.nodeDirectory.login(nodeInformation);            
             
             //5]Create log
             this.log = new Log("log/"+nodeName);

@@ -14,7 +14,16 @@ public class NodeInfo implements Serializable{
     
     private static final long serialVersionUID = -1937161867341487111L;
     
+    /**
+     * Process ID
+     */
     private int ID;
+ 
+    /**
+     * Where the process Registry is
+     */
+    private String IP;
+    private int port;
 
     public int getID() {
         return ID;
@@ -24,9 +33,25 @@ public class NodeInfo implements Serializable{
         this.ID = ID;
     }
 
+    public String getIP() {
+        return IP;
+    }
+
+    public void setIP(String IP) {
+        this.IP = IP;
+    }
+
+    public void setPort(int port) {
+        this.port = port;
+    }
+
+    public int getPort() {
+        return port;
+    }
+
     @Override
     public String toString() {
-        return "[Node ID:"+ID+"]";
+        return "[Node ID:"+ID+";IP:"+IP+":"+port+"]";
     }
 
     @Override

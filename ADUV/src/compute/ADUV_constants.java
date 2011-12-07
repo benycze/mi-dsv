@@ -12,6 +12,7 @@ public interface ADUV_constants {
     
     public final String DIRECTORY_RMI_NAME = "NodeDirectory";
     public final int DIRECTORY_PORT = 5000;
+    public final int NODE_PORT = 4000;
     
     public final int DIRECTORY_NAMESPACE_PORT = 2000;
     

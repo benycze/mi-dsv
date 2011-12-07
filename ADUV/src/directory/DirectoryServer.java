@@ -7,6 +7,7 @@ package directory;
 import compute.ADUV_constants;
 import compute.DirectoryInterface;
 import compute.NodeInterface;
+import java.rmi.AlreadyBoundException;
 import java.rmi.NotBoundException;
 import java.rmi.RMISecurityManager;
 import java.rmi.RemoteException;
@@ -37,7 +38,7 @@ public class DirectoryServer implements ADUV_constants{
      */
     private Registry registry;
     
-    public static void main(String[] args) throws InterruptedException{
+    public static void main(String[] args) throws InterruptedException, AlreadyBoundException{
         int port = DIRECTORY_NAMESPACE_PORT;
         
         if(args.length == 1){
@@ -55,8 +56,10 @@ public class DirectoryServer implements ADUV_constants{
             //export directory
             DirectoryInterface stub = (DirectoryInterface) UnicastRemoteObject.exportObject(directory,DIRECTORY_PORT);
             Registry registry = LocateRegistry.createRegistry(port);
-            registry.rebind(DIRECTORY_RMI_NAME, stub);
-            System.out.println("Directory server started.");
+            registry.bind(DIRECTORY_RMI_NAME, stub);
+            System.out.println("Directory server started on port "+port+".");
+            //System.out.println("Stub info:"+stub.toString());
+            //System.out.println("Registry info:"+registry.toString());
             //drop to console
             new DirectoryServer().DropToConsole(stub,registry);
         } catch (RemoteException ex) {
@@ -120,10 +123,11 @@ public class DirectoryServer implements ADUV_constants{
      * @param nodeInfo 
      */
     private void sendStartMessage(NodeInfo nodeInfo) throws RemoteException, NotBoundException {
+        Registry nodeRegistry = this.LocateNodeRegistry(nodeInfo);
         Message startMess = new Message(MessageType.START,-1,Color.BLACK, "");
         String nodeName = NODE_NAME_PREFIX+nodeInfo.getID();
         NodeInterface nodeDirectory = 
-                (NodeInterface)this.registry.lookup(nodeName);
+                (NodeInterface)nodeRegistry.lookup(nodeName);
         nodeDirectory.putMessage(startMess);
     }
     
@@ -132,10 +136,19 @@ public class DirectoryServer implements ADUV_constants{
      * @param nodeInfo 
      */
     private void sendStopMessage(NodeInfo nodeInfo) throws RemoteException, NotBoundException {
+        Registry nodeRegistry = this.LocateNodeRegistry(nodeInfo);
         Message startMess = new Message(MessageType.STOP,-1,Color.BLACK, "");
         String nodeName = NODE_NAME_PREFIX+nodeInfo.getID();
         NodeInterface nodeDirectory = 
-                (NodeInterface)this.registry.lookup(nodeName);
+                (NodeInterface)nodeRegistry.lookup(nodeName);
         nodeDirectory.putMessage(startMess);
+    }
+    
+    /**
+     * This method finds registry for the ś
+     * @param nodeInfo 
+     */
+    private Registry LocateNodeRegistry(NodeInfo nodeInfo) throws RemoteException{
+        return LocateRegistry.getRegistry(nodeInfo.getIP(),nodeInfo.getPort());
     }
 }

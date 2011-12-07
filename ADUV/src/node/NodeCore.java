@@ -10,6 +10,7 @@ import compute.NodeInterface;
 import java.io.Serializable;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
+import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.LinkedList;
@@ -298,7 +299,24 @@ public class NodeCore extends UnicastRemoteObject implements NodeInterface,Seria
      * @param address 
      */
     private void sendMessageToProcess(Message workMess,int address) throws RemoteException, NotBoundException {
+        //1]locate NodeInfo object
+        NodeInfo[] nodeInfos = this.directory.listNodes();
+        NodeInfo regNode = null;
+        System.out.println("NodeInfoLength = "+nodeInfos.length+"\n"+
+                "Processing nodes:");
+        for(int i=0;i<nodeInfos.length;i++){
+            System.out.println("-->"+nodeInfos[i].toString()+" "+address);
+            if(nodeInfos[i].getID() == address){
+                regNode = nodeInfos[i];
+            }
+        }
+        
+        //2]Get remote registry
+        Registry remoteRegistry = LocateRegistry.getRegistry(regNode.getIP(), regNode.getPort());
+ 
+        //3]Lookup and put data
         String nodeName = NODE_NAME_PREFIX+address;
+        
         //set clock
         this.clock ++; //increment clock
         workMess.setClock(clock);
@@ -306,7 +324,7 @@ public class NodeCore extends UnicastRemoteObject implements NodeInterface,Seria
         //message prepared
         this.log.logNode("Sending message to processs "+address+"-->"+workMess.toString(), clock, this.nodeInfo.getID());
         NodeInterface nodeDirectory = 
-                (NodeInterface)this.registry.lookup(nodeName);
+                (NodeInterface)remoteRegistry.lookup(nodeName);
         nodeDirectory.putMessage(workMess);
     }
 
