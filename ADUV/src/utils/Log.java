@@ -22,6 +22,11 @@ public class Log {
 
     public Log(String outputPath) {
         this.outputFile = new File(outputPath);
+        
+        //check if exists --> yes; delete it
+        if(this.outputFile.exists()){
+            this.outputFile.delete();
+        }
     }
     
     public void logNode(String log, int logTime, int id){
@@ -58,7 +63,7 @@ public class Log {
      * @return 
      */
     private BufferedWriter openFile() throws IOException {
-        return new BufferedWriter(new FileWriter(this.outputFile));
+        return new BufferedWriter(new FileWriter(this.outputFile,true));
     }
     
     
